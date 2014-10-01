@@ -60,7 +60,7 @@ sys_sleep(void)
 {
   int n;
   uint ticks0;
-  
+
   if(argint(0, &n) < 0)
     return -1;
   acquire(&tickslock);
@@ -82,7 +82,7 @@ int
 sys_uptime(void)
 {
   uint xticks;
-  
+
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
@@ -93,5 +93,20 @@ int sys_date(void) {
   struct rtcdate* date;
   argptr(0, (void*)(&date), sizeof(*date));
   cmostime(date);
+  return 0;
+}
+
+int
+sys_alarm(void)
+{
+  int ticks;
+  void (*handler)();
+
+  if(argint(0, &ticks) < 0)
+    return -1;
+  if(argptr(1, (char**)&handler, 1) < 0)
+    return -1;
+  proc->alarmticks = ticks;
+  proc->alarmhandler = handler;
   return 0;
 }
